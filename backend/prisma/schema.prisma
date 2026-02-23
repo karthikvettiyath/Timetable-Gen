@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Faculty {
+  id               String          @id @default(uuid())
+  name             String
+  email            String          @unique
+  unavailableSlots String?
+  weeklyWorkload   Int             @default(18)
+  subjects         Subject[]       @relation("FacultySubjects")
+  schedules        ScheduleEntry[]
+}
+
+model Room {
+  id               String          @id @default(uuid())
+  name             String
+  capacity         Int
+  isLab            Boolean         @default(false)
+  hasProjector     Boolean         @default(false)
+  schedules        ScheduleEntry[]
+}
+
+model Subject {
+  id               String          @id @default(uuid())
+  name             String
+  code             String          @unique
+  contactHours     Int
+  requiresLab      Boolean         @default(false)
+  faculties        Faculty[]       @relation("FacultySubjects")
+  schedules        ScheduleEntry[]
+}
+
+model ClassGroup {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  schedules ScheduleEntry[]
+}
+
+model TimeSlot {
+  id          String          @id @default(uuid())
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  schedules   ScheduleEntry[]
+}
+
+model ScheduleEntry {
+  id           String     @id @default(uuid())
+  classGroupId String
+  subjectId    String
+  facultyId    String
+  roomId       String
+  timeslotId   String
+  
+  classGroup   ClassGroup @relation(fields: [classGroupId], references: [id])
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  faculty      Faculty    @relation(fields: [facultyId], references: [id])
+  room         Room       @relation(fields: [roomId], references: [id])
+  timeslot     TimeSlot   @relation(fields: [timeslotId], references: [id])
+
+  @@index([classGroupId])
+  @@index([facultyId])
+  @@index([roomId])
+}

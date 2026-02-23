@@ -1,0 +1,151 @@
+Here is the comprehensive documentation package for **SmartSchedule**, tailored for a **Node.js** backend environment.
+
+---
+
+# 1. Product Requirements Document (PRD)
+
+## 1.1 Project Overview
+
+* **Product Name:** SmartSchedule - Automated Timetable Generator
+* **Version:** 1.0
+* **Objective:** To replace manual academic scheduling with an automated, constraint-based system that generates conflict-free timetables in minutes rather than weeks.
+
+## 1.2 User Roles & Permissions
+
+| Role | Permissions |
+| --- | --- |
+| **Admin** | Full access. Manage faculty, rooms, subjects, define constraints, trigger generation, and finalize schedules. |
+| **Faculty** | View personal schedule, request specific time-offs (constraints), download PDF. |
+| **Student** | Read-only access to their specific class/section timetable. |
+
+## 1.3 Functional Requirements
+
+### Module 1: Data Management (CRUD)
+
+* **FR-01 Faculty Mgmt:** Admin can add faculty details, designate "Head of Dept," and set maximum weekly workload (e.g., 18 hours/week).
+* **FR-02 Infrastructure:** Admin can define Rooms and Labs with specific attributes (Capacity, Projector availability, etc.).
+* **FR-03 Academic Structure:** Define Courses, Semesters, and Sections. Map Subjects to Semesters.
+
+### Module 2: Constraint Engine
+
+The system must support two types of constraints:
+
+* **FR-04 Hard Constraints (Mandatory):**
+* *One Place Rule:* A professor cannot teach two classes simultaneously.
+* *Room Availability:* A room cannot host two classes simultaneously.
+* *Lab Continuity:* Labs must be scheduled in consecutive blocks (e.g., 3 hours).
+
+
+* **FR-05 Soft Constraints (Optimization):**
+* *Distribution:* Spread difficult subjects (e.g., Math, Physics) across the week rather than bunching them on one day.
+* *Gap Management:* Minimize idle gaps for students between classes.
+
+
+
+### Module 3: Generation & Export
+
+* **FR-06 Computation:** Use a background worker to process the schedule without freezing the UI.
+* **FR-07 Visualization:** Display the result in a responsive Calendar/Grid view.
+* **FR-08 Export:** Download Master Timetable (Admin), Individual Timetable (Faculty), and Class Timetable (Student) in PDF/Excel.
+
+## 1.4 Non-Functional Requirements
+
+* **Performance:** The generation algorithm must complete within **< 3 minutes** for a dataset of 1,000 students.
+* **Scalability:** The database must handle concurrent access by 2,000+ users during the start of the semester.
+* **Reliability:** The system must save "Draft" schedules so data isn't lost if the browser is closed during generation.
+
+---
+
+# 2. System Design Document (SDD)
+
+## 2.1 High-Level Architecture
+
+We will use a **Client-Server Architecture** with an asynchronous processing model for the heavy lifting.
+
+1. **Client (React):** Sends a "Start Generation" signal via API.
+2. **API Gateway (NestJS/Express):** Authenticates the request and spawns a child process.
+3. **Worker Thread:** Loads data from the DB, runs the Genetic Algorithm, and writes the result back to the DB.
+4. **Notification:** The server pushes a notification (via WebSocket or Polling) to the Client when the schedule is ready.
+
+## 2.2 Database Schema (ERD - Key Entities)
+
+* **`Faculty`**: `id`, `name`, `email`, `unavailable_slots` (Array of JSON)
+* **`Room`**: `id`, `name`, `capacity`, `is_lab` (Boolean)
+* **`Subject`**: `id`, `name`, `code`, `contact_hours`, `requires_lab`
+* **`ClassGroup`**: `id`, `name` (e.g., "CS-Sem5-SectionA")
+* **`TimeSlot`**: `id`, `day_of_week`, `start_time`, `end_time`
+* **`ScheduleEntry`** (The Output):
+* `id`
+* `class_group_id` (FK)
+* `subject_id` (FK)
+* `faculty_id` (FK)
+* `room_id` (FK)
+* `timeslot_id` (FK)
+
+
+
+## 2.3 Algorithm Logic (The "Brain")
+
+We will use a **Genetic Algorithm** or **Simulated Annealing** approach.
+
+1. **Initialization:** Create 10 random schedules.
+2. **Evaluation (Fitness Function):** Loop through every slot in a schedule.
+* *If Faculty A is in Room 1 AND Room 2 at 10 AM* -> **Penalty -100**.
+* *If Room 101 has 60 students but capacity is 40* -> **Penalty -50**.
+* *If constraints met* -> **Score +10**.
+
+
+3. **Selection:** Discard the schedules with high penalties. Keep the best ones.
+4. **Crossover/Mutation:** Swap classes between the best schedules to try and fix remaining conflicts.
+5. **Termination:** Stop when Penalty = 0.
+
+---
+
+# 3. Tech Stack Document
+
+## 3.1 Frontend (User Interface)
+
+* **Framework:** **React.js** (v18+)
+* *Why:* Component-based architecture is perfect for the complex "Grid" layout of a timetable.
+
+
+* **Language:** **TypeScript**
+* *Why:* Essential for managing the complex data types (Teacher objects, Room objects) without bugs.
+
+
+* **State Management:** **Redux Toolkit**
+* *Why:* To manage the global state of the "Draft Timetable" as the user manually tweaks it.
+
+
+* **UI Library:** **MUI (Material UI)** or **Chakra UI**.
+* *Specific Need:* Use a Data Grid component for the timetable display.
+
+
+
+## 3.2 Backend (API & Logic)
+
+* **Runtime:** **Node.js**
+* **Framework:** **NestJS**
+* *Why:* NestJS is structured (Controllers, Services, Modules) and scales better than plain Express for enterprise apps. It creates a clean separation between the "API layer" and the "Algorithm layer."
+
+
+* **Processing:** **Node.js Worker Threads** (`worker_threads`)
+* *Crucial:* Timetable generation is CPU-intensive. Running it on the main thread will crash the server. Worker threads run the algorithm in parallel.
+
+
+* **Validation:** `class-validator` (To ensure admin inputs valid data before the algorithm runs).
+
+## 3.3 Database
+
+* **Database Engine:** **PostgreSQL**
+* *Why:* We need strict relational integrity. If a Room is deleted, we need the database to cascade that change or warn the admin.
+
+* **ORM:** **Prisma**
+* *Why:* Best-in-class TypeScript support. It autogenerates the types for your backend based on your schema.
+
+## 3.4 Infrastructure
+
+* **Docker:** To containerize the application, ensuring the complex algorithm runs exactly the same on your laptop and the cloud server.
+* **Hosting:**
+* *Frontend:* Vercel
+* *Backend:* Railway or AWS (EC2) - Requires a server with decent CPU power.
