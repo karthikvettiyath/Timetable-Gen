@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Button, Container, Typography, Grid, Card, CardContent, Stack, useTheme, Divider } from '@mui/material';
+import { Box, Button, Container, Typography, Card, CardContent, Stack, Divider } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -10,7 +10,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import SchoolIcon from '@mui/icons-material/School';
 
 const LandingPage: React.FC = () => {
-    const theme = useTheme();
 
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
@@ -100,7 +99,7 @@ const LandingPage: React.FC = () => {
             <Box sx={{ position: 'relative', pt: { xs: 6, md: 10 }, pb: 10 }}>
                 <Container maxWidth="lg">
                     <Grid container spacing={4} alignItems="center">
-                        <Grid item xs={12} md={6}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                             <motion.div
                                 initial={{ opacity: 0, x: -30 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -200,7 +199,7 @@ const LandingPage: React.FC = () => {
                             </motion.div>
                         </Grid>
 
-                        <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+                        <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }}>
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
                                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -262,7 +261,7 @@ const LandingPage: React.FC = () => {
                             { label: 'Institutions', value: '500+', color: '#2B3674' },
                             { label: 'Uptime', value: '99.9%', color: '#FFB547' }
                         ].map((stat, i) => (
-                            <Grid item xs={6} md={3} key={i}>
+                            <Grid size={{ xs: 6, md: 3 }} key={i}>
                                 <Box sx={{ textAlign: 'center' }}>
                                     <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color, mb: 0.5 }}>{stat.value}</Typography>
                                     <Typography variant="body2" sx={{ color: '#707EAE', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>{stat.label}</Typography>
@@ -291,7 +290,7 @@ const LandingPage: React.FC = () => {
                         { title: 'Conflict Detection', icon: <SpeedIcon />, desc: 'Instant feedback on room clashes, teacher overlaps, and student availability.', color: '#FFB547' },
                         { title: 'Modern Visuals', icon: <CalendarMonthIcon />, desc: 'Beautifully rendered timetables exportable to PDF, Excel, and Google Calendar.', color: '#E31A1A' }
                     ].map((feature, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                             <motion.div
                                 variants={itemVariants}
                                 initial="hidden"
@@ -391,7 +390,7 @@ const LandingPage: React.FC = () => {
             <Box sx={{ py: 8, borderTop: '1px solid #F4F7FE' }}>
                 <Container maxWidth="lg">
                     <Grid container spacing={4} justifyContent="space-between" alignItems="center">
-                        <Grid item xs={12} md={4}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                                 <Box sx={{
                                     width: 32, height: 32, borderRadius: '8px',
@@ -408,7 +407,7 @@ const LandingPage: React.FC = () => {
                                 Empowering educational institutions through intelligent automation and elegant design.
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                             <Stack direction="row" spacing={4} justifyContent={{ xs: 'center', md: 'flex-end' }}>
                                 <Typography sx={{ color: '#707EAE', fontWeight: 600, cursor: 'pointer', '&:hover': { color: '#4318FF' } }}>Product</Typography>
                                 <Typography sx={{ color: '#707EAE', fontWeight: 600, cursor: 'pointer', '&:hover': { color: '#4318FF' } }}>Pricing</Typography>

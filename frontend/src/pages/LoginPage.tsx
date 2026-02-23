@@ -297,42 +297,48 @@ const LoginPage: React.FC = () => {
                                 <Stack direction="row" spacing={1.5} justifyContent="center">
                                     <Button
                                         onClick={() => handleDemoLogin(2)}
-                                        variant="soft"
                                         sx={{
                                             borderRadius: '12px',
                                             textTransform: 'none',
                                             fontWeight: 600,
                                             color: '#4318FF',
                                             bgcolor: 'rgba(67, 24, 255, 0.08)',
-                                            px: 2
+                                            px: 2,
+                                            '&:hover': {
+                                                bgcolor: 'rgba(67, 24, 255, 0.15)',
+                                            }
                                         }}
                                     >
                                         Admin
                                     </Button>
                                     <Button
                                         onClick={() => handleDemoLogin(1)}
-                                        variant="soft"
                                         sx={{
                                             borderRadius: '12px',
                                             textTransform: 'none',
                                             fontWeight: 600,
                                             color: '#05CD99',
                                             bgcolor: 'rgba(5, 205, 153, 0.08)',
-                                            px: 2
+                                            px: 2,
+                                            '&:hover': {
+                                                bgcolor: 'rgba(5, 205, 153, 0.15)',
+                                            }
                                         }}
                                     >
                                         Teacher
                                     </Button>
                                     <Button
                                         onClick={() => handleDemoLogin(0)}
-                                        variant="soft"
                                         sx={{
                                             borderRadius: '12px',
                                             textTransform: 'none',
                                             fontWeight: 600,
                                             color: '#FFB547',
                                             bgcolor: 'rgba(255, 181, 71, 0.08)',
-                                            px: 2
+                                            px: 2,
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255, 181, 71, 0.15)',
+                                            }
                                         }}
                                     >
                                         User
